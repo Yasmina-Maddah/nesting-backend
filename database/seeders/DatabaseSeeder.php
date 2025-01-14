@@ -11,11 +11,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             ChildrenProfileSeeder::class,
-            MoodBoardSeeder::class,
             SkillSeeder::class,
             ChildSkillSeeder::class,
             ProgressReportSeeder::class,
             AiVisualizationSeeder::class,
+            MoodBoardSeeder::class,
         ]);
     }
 }

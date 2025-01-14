@@ -30,6 +30,11 @@ class ChildrenProfile extends Model
         return $this->hasMany(ChildSkill::class, 'child_id');
     }
 
+    public function moodBoards()
+    {
+        return $this->hasMany(MoodBoard::class, 'child_profile_id');
+    }
+
     // Accessors and Mutators for hobbies
     public function getHobbiesAttribute($value)
     {
