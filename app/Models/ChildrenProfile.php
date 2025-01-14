@@ -14,7 +14,9 @@ class ChildrenProfile extends Model
         'name',
         'profile_photo',
         'cover_photo',
-        'age',
+        'date_of_birth', // Added date_of_birth
+        'hobbies',       // Added hobbies (JSON-encoded)
+        'dream_career',  // Added dream_career
     ];
 
     // Relationships
@@ -26,5 +28,16 @@ class ChildrenProfile extends Model
     public function skills()
     {
         return $this->hasMany(ChildSkill::class, 'child_id');
+    }
+
+    // Accessors and Mutators for hobbies
+    public function getHobbiesAttribute($value)
+    {
+        return json_decode($value, true); // Decode JSON hobbies into an array
+    }
+
+    public function setHobbiesAttribute($value)
+    {
+        $this->attributes['hobbies'] = json_encode($value); // Encode hobbies as JSON
     }
 }
