@@ -13,8 +13,14 @@ return new class extends Migration
     {
         Schema::create('children_profiles', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('parent_id')->constrained('users')->onDelete('cascade');
+            $table->string('name');
+            $table->string('profile_photo')->nullable();
+            $table->string('cover_photo')->nullable();
+            $table->integer('age');
             $table->timestamps();
         });
+        
     }
 
     /**
