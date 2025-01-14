@@ -13,8 +13,12 @@ return new class extends Migration
     {
         Schema::create('child_skills', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('child_id')->constrained('children_profiles')->onDelete('cascade');
+            $table->foreignId('skill_id')->constrained('skills')->onDelete('cascade');
+            $table->integer('progress')->default(0);
             $table->timestamps();
         });
+        
     }
 
     /**
