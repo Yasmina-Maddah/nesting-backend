@@ -17,10 +17,11 @@ return new class extends Migration
             $table->string('name');
             $table->string('profile_photo')->nullable();
             $table->string('cover_photo')->nullable();
-            $table->integer('age');
+            $table->date('date_of_birth')->nullable(); // Added date_of_birth
+            $table->text('hobbies')->nullable(); // Added hobbies (JSON-encoded)
+            $table->string('dream_career')->nullable(); // Added dream_career
             $table->timestamps();
         });
-        
     }
 
     /**
