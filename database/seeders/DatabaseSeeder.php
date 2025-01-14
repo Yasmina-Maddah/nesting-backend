@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
             SkillSeeder::class,
             ChildSkillSeeder::class,
             ProgressReportSeeder::class,
-            AIVisualizationSeeder::class,
+            AiVisualizationSeeder::class,
         ]);
     }
 }
