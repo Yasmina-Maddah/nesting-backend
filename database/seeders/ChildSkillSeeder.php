@@ -2,16 +2,15 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\ChildSkill;
 
 class ChildSkillSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
+    public function run()
     {
-        //
+        ChildSkill::create(['child_id' => 1, 'skill_id' => 1, 'progress' => 50]); // John - Math
+        ChildSkill::create(['child_id' => 1, 'skill_id' => 2, 'progress' => 70]); // John - Reading
+        ChildSkill::create(['child_id' => 2, 'skill_id' => 3, 'progress' => 40]); // Jane - Creativity
     }
 }
