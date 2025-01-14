@@ -15,6 +15,9 @@ class ChildrenProfileSeeder extends Seeder
             'age' => 7,
             'profile_photo' => 'john.jpg',
             'cover_photo' => 'john_cover.jpg',
+            'date_of_birth' => '2016-03-15',
+            'hobbies' => json_encode(['Drawing', 'Cycling']),
+            'dream_career' => 'Astronaut',
         ]);
 
         ChildrenProfile::create([
@@ -23,6 +26,9 @@ class ChildrenProfileSeeder extends Seeder
             'age' => 9,
             'profile_photo' => 'jane.jpg',
             'cover_photo' => 'jane_cover.jpg',
+            'date_of_birth' => '2014-07-20',
+            'hobbies' => json_encode(['Swimming', 'Reading']),
+            'dream_career' => 'Doctor',
         ]);
     }
 }
