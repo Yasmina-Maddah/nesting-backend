@@ -13,8 +13,13 @@ return new class extends Migration
     {
         Schema::create('ai_visualizations', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('parent_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('skill_id')->constrained('skills')->onDelete('cascade');
+            $table->text('story_input');
+            $table->text('visualization')->nullable();
             $table->timestamps();
         });
+        
     }
 
     /**
