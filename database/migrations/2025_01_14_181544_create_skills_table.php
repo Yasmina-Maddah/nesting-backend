@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('skill_name')->unique();
             $table->text('description')->nullable();
+            $table->string('image_path')->nullable();
+            $table->foreignId('parent_skill_id')->nullable()->constrained('skills')->onDelete('set null');
             $table->timestamps();
         });
         
