@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('child_skill_id')->constrained('child_skills')->onDelete('cascade');
             $table->integer('progress_entry');
+            $table->json('details')->nullable();
             $table->timestamps();
         });
         
