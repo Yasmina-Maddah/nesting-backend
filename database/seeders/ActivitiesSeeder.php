@@ -2,16 +2,17 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Activity;
 
 class ActivitiesSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
+    public function run()
     {
-        //
+        Activity::create([
+            'child_skill_id' => 1,
+            'description' => 'Solve a 50-piece jigsaw puzzle',
+            'status' => 'completed',
+        ]);
     }
 }
