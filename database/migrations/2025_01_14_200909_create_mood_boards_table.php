@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('mood_boards', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('child_profile_id')->constrained('children_profiles')->onDelete('cascade'); // Relationship with child profiles
-            $table->string('image_path'); // Path to the image
-            $table->string('description')->nullable(); // Optional description of the image
+            $table->foreignId('child_profile_id')->constrained('children_profiles')->onDelete('cascade'); 
+            $table->string('image_path'); 
+            $table->string('description')->nullable(); 
             $table->timestamps();
         });
     }
