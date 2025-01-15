@@ -4,6 +4,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CustomizationController;
+use App\Http\Controllers\MoodBoardController;
+use App\Http\Controllers\DashboardController;
+
 
 
 Route::post('/signup', [AuthController::class, 'signup']);
