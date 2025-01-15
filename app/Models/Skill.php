@@ -9,12 +9,13 @@ class Skill extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'skill_name',
-        'description',
-    ];
+    protected $fillable = ['skill_name', 'description', 'image_path', 'parent_skill_id'];
 
-    // Relationships
+    public function parentSkill()
+    {
+        return $this->belongsTo(Skill::class, 'parent_skill_id');
+    }
+
     public function childSkills()
     {
         return $this->hasMany(ChildSkill::class, 'skill_id');
