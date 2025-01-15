@@ -11,6 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::create('activities', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('child_skill_id')->constrained('child_skills')->onDelete('cascade');
+            $table->text('description');
+            $table->enum('status', ['pending', 'completed'])->default('pending');
+            $table->timestamps();
+        });
         //
     }
 
