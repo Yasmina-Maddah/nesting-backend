@@ -9,15 +9,18 @@ class AiVisualization extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['parent_id', 'skill_id', 'theme', 'prompt', 'generated_story'];
+    protected $fillable = [
+        'child_id', 'skill_id', 'theme', 'prompt', 'generated_story'
+    ];
 
-    public function parent()
+    public function child()
     {
-        return $this->belongsTo(User::class, 'parent_id');
+        return $this->belongsTo(ChildrenProfile::class);
     }
 
     public function skill()
     {
-        return $this->belongsTo(Skill::class, 'skill_id');
+        return $this->belongsTo(Skill::class);
     }
 }
+
