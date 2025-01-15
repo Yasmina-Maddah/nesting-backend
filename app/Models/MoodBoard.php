@@ -9,13 +9,8 @@ class MoodBoard extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'child_profile_id',
-        'image_path',
-        'description',
-    ];
+    protected $fillable = ['child_profile_id', 'image_path', 'description'];
 
-    // Relationship with ChildrenProfile
     public function childProfile()
     {
         return $this->belongsTo(ChildrenProfile::class, 'child_profile_id');
