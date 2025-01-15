@@ -9,6 +9,7 @@ use App\Http\Controllers\MoodBoardController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AiVisualizationController;
 use App\Http\Controllers\SkillController;
+use App\Http\Controllers\ProgressReportController;
 
 
 Route::post('/signup', [AuthController::class, 'signup']);
@@ -44,3 +45,6 @@ Route::post('/child/{id}/skill/select', [SkillController::class, 'selectSkill'])
 
 Route::post('/child/{id}/ai-visualization', [AiVisualizationController::class, 'generateVisualization']); // Generate visualization
 Route::get('/child/{id}/ai-visualization', [AiVisualizationController::class, 'getVisualizations']); // Get previous visualizations
+
+Route::post('/child/{id}/generate-report', [ProgressReportController::class, 'generateReport']);
+Route::get('/child/{id}/report', [ProgressReportController::class, 'getReport']);
