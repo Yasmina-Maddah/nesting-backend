@@ -23,6 +23,6 @@ class Skill extends Model
 
     public function aiVisualizations()
     {
-        return $this->hasMany(AIVisualization::class, 'skill_id');
+        return $this->hasMany(AiVisualization::class, 'skill_id');
     }
 }

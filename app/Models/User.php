@@ -69,6 +69,6 @@ class User extends Authenticatable implements JWTSubject
      */
     public function aiVisualizations()
     {
-        return $this->hasMany(AIVisualization::class, 'parent_id');
+        return $this->hasMany(AiVisualization::class, 'parent_id');
     }
 }
