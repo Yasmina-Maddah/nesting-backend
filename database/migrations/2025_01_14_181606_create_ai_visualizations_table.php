@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('parent_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('skill_id')->constrained('skills')->onDelete('cascade');
-            $table->text('story_input');
-            $table->text('visualization')->nullable();
+            $table->string('theme');
+            $table->text('prompt');
+            $table->text('generated_story')->nullable();
             $table->timestamps();
         });
         
