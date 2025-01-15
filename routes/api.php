@@ -8,6 +8,7 @@ use App\Http\Controllers\CustomizationController;
 use App\Http\Controllers\MoodBoardController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AiVisualizationController;
+use App\Http\Controllers\SkillController;
 
 
 Route::post('/signup', [AuthController::class, 'signup']);
@@ -41,5 +42,5 @@ Route::get('dashboard/{parentId}', [DashboardController::class, 'getDashboardDat
 
 Route::post('/child/{id}/skill/select', [SkillController::class, 'selectSkill']); // Skill selection
 
-Route::post('/child/{id}/ai-visualization', [AIVisualizationController::class, 'generateVisualization']); // Generate visualization
-Route::get('/child/{id}/ai-visualization', [AIVisualizationController::class, 'getVisualizations']); // Get previous visualizations
+Route::post('/child/{id}/ai-visualization', [AiVisualizationController::class, 'generateVisualization']); // Generate visualization
+Route::get('/child/{id}/ai-visualization', [AiVisualizationController::class, 'getVisualizations']); // Get previous visualizations
