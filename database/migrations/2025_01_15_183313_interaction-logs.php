@@ -11,6 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::create('interaction_logs', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('child_id')->constrained('children_profiles')->onDelete('cascade');
+            $table->foreignId('activity_id')->nullable()->constrained('activities')->onDelete('set null');
+            $table->timestamp('interaction_time')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->text('notes')->nullable();
+            $table->timestamps();
+        });
         //
     }
 
