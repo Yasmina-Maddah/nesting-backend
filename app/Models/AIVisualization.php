@@ -5,18 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AiVisualization extends Model
+class AIVisualization extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'parent_id',
-        'skill_id',
-        'story_input',
-        'visualization',
-    ];
+    protected $fillable = ['parent_id', 'skill_id', 'theme', 'prompt', 'generated_story'];
 
-    // Relationships
     public function parent()
     {
         return $this->belongsTo(User::class, 'parent_id');
