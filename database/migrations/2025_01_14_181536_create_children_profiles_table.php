@@ -20,6 +20,7 @@ return new class extends Migration
             $table->date('date_of_birth')->nullable(); // Added date_of_birth
             $table->text('hobbies')->nullable(); // Added hobbies (JSON-encoded)
             $table->string('dream_career')->nullable(); // Added dream_career
+            $table->boolean('archived')->default(false);
             $table->timestamps();
         });
     }
