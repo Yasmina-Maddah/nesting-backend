@@ -38,6 +38,7 @@ class ChildrenProfile extends Model
 
     public function skills()
     {
-    return $this->belongsToMany(Skill::class, 'child_skills')->withPivot('id', 'progress');
+    return $this->belongsToMany(Skill::class, 'child_skills', 'child_id', 'skill_id')
+                ->withPivot('id', 'progress');
     }
 }

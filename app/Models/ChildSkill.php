@@ -23,11 +23,17 @@ class ChildSkill extends Model
 
     public function progressReports()
     {
-        return $this->hasMany(ProgressReport::class, 'child_skill_id');
+        return $this->hasMany(ProgressReport::class);
     }
 
     public function activities()
     {
         return $this->hasMany(Activity::class, 'child_skill_id');
+    }
+
+    public function skills()
+    {
+    return $this->belongsToMany(Skill::class, 'child_skills', 'child_id', 'skill_id')
+                ->withPivot('id', 'progress');
     }
 }
