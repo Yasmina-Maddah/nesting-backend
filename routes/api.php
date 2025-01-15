@@ -39,3 +39,7 @@ Route::prefix('profile')->group(function () {
 
 Route::get('dashboard/{parentId}', [DashboardController::class, 'getDashboardData']);
 
+Route::post('/child/{id}/skill/select', [SkillController::class, 'selectSkill']); // Skill selection
+
+Route::post('/child/{id}/ai-visualization', [AIVisualizationController::class, 'generateVisualization']); // Generate visualization
+Route::get('/child/{id}/ai-visualization', [AIVisualizationController::class, 'getVisualizations']); // Get previous visualizations
