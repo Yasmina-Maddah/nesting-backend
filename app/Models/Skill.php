@@ -25,4 +25,9 @@ class Skill extends Model
     {
         return $this->hasMany(AiVisualization::class, 'skill_id');
     }
+
+    public function progressReports()
+    {
+    return $this->hasOne(ProgressReport::class, 'child_skill_id');
+    }
 }
