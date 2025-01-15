@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\AiVisualization;
+use App\Models\AIVisualization;
 use App\Models\ChildrenProfile;
-use App\Models\Skill;
-use OpenAI\Client;
+use OpenAI;
 
 class AiVisualizationController extends Controller
 {
@@ -14,7 +13,7 @@ class AiVisualizationController extends Controller
 
     public function __construct()
     {
-        $this->openai = new Client(['apiKey' => config('services.openai.key')]);
+        $this->openai = OpenAI::client(config('services.openai.key'));
     }
 
     public function generateVisualization(Request $request, $id)
@@ -73,16 +72,5 @@ class AiVisualizationController extends Controller
                 'details' => $e->getMessage(),
             ], 500);
         }
-    }
-
-    public function getVisualizations($id)
-    {
-        $visualizations = AiVisualization::where('child_id', $id)->get();
-
-        if ($visualizations->isEmpty()) {
-            return response()->json(['message' => 'No visualizations found for this child'], 404);
-        }
-
-        return response()->json($visualizations, 200);
     }
 }
