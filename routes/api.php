@@ -7,7 +7,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CustomizationController;
 use App\Http\Controllers\MoodBoardController;
 use App\Http\Controllers\DashboardController;
-
+use App\Http\Controllers\AiVisualizationController;
 
 
 Route::post('/signup', [AuthController::class, 'signup']);
@@ -38,3 +38,8 @@ Route::prefix('profile')->group(function () {
 });
 
 Route::get('dashboard/{parentId}', [DashboardController::class, 'getDashboardData']);
+
+Route::prefix('ai-visualizations')->group(function () {
+    Route::post('/', [AiVisualizationController::class, 'createVisualization']); // Create visualization
+    Route::get('/{parentId}', [AiVisualizationController::class, 'getVisualizations']); // Get all visualizations for a parent
+});
