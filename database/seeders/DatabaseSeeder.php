@@ -9,13 +9,15 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-            UserSeeder::class,
-            ChildrenProfileSeeder::class,
-            SkillSeeder::class,
-            ChildSkillSeeder::class,
-            ProgressReportSeeder::class,
-            AiVisualizationSeeder::class,
-            MoodBoardSeeder::class,
+            UsersSeeder::class,
+            ChildrenProfilesSeeder::class,
+            SkillsSeeder::class,
+            ChildSkillsSeeder::class,
+            MoodBoardsSeeder::class,
+            AiVisualizationsSeeder::class,
+            ProgressReportsSeeder::class,
+            ActivitiesSeeder::class,
+            InteractionLogsSeeder::class,
         ]);
     }
 }
