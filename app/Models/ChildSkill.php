@@ -9,13 +9,8 @@ class ChildSkill extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'child_id',
-        'skill_id',
-        'progress',
-    ];
+    protected $fillable = ['child_id', 'skill_id', 'progress'];
 
-    // Relationships
     public function child()
     {
         return $this->belongsTo(ChildrenProfile::class, 'child_id');
@@ -29,5 +24,10 @@ class ChildSkill extends Model
     public function progressReports()
     {
         return $this->hasMany(ProgressReport::class, 'child_skill_id');
+    }
+
+    public function activities()
+    {
+        return $this->hasMany(Activity::class, 'child_skill_id');
     }
 }
