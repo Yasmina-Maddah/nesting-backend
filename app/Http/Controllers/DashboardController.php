@@ -2,15 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ChildrenProfile;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    // GET /dashboard/{parentId}
-    public function getDashboardData($parentId)
+    public function getWelcomeMessage()
     {
-        $profiles = ChildrenProfile::where('parent_id', $parentId)->get();
+        $user = Auth::user();
 
-        return response()->json($profiles);
+        if ($user) {
+            return response()->json([
+                'message' => 'Welcome, ' . $user->username . '!',
+            ], 200);
+        }
+
+        return response()->json([
+            'error' => 'User not authenticated.',
+        ], 401);
     }
 }
