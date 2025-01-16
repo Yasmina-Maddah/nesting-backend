@@ -28,5 +28,15 @@ class ChildrenProfileSeeder extends Seeder
             'hobbies' => json_encode(['Swimming', 'Reading']),
             'dream_career' => 'Doctor',
         ]);
+
+        ChildrenProfile::create([
+            'parent_id' => 5, // Parent1 ID
+            'name' => 'Jana Maddah',
+            'profile_photo' => null,
+            'cover_photo' => null,
+            'date_of_birth' => '2020-03-15',
+            'hobbies' => json_encode(['Drawing', 'Math']),
+            'dream_career' => 'Astronaut',
+        ]);
     }
 }
