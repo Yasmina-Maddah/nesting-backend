@@ -10,7 +10,6 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AiVisualizationController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\ProgressReportController;
-use App\Http\Controllers\UserController;
 
 
 
@@ -41,7 +40,7 @@ Route::prefix('profile')->group(function () {
     });
 });
 
-Route::get('/parent', [UserController::class, 'getParentDetails']);
+Route::middleware('auth:api')->get('/user', [AuthController::class, 'getUser']);
 
 Route::post('/child/{id}/skill/select', [SkillController::class, 'selectSkill']); // Skill selection
 
