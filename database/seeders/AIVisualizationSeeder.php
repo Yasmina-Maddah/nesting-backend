@@ -4,44 +4,92 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\AiVisualization;
-use App\Models\Skill;
-
 
 class AiVisualizationSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
     public function run()
     {
-
-        $MathSkillId = Skill::where('skill_name', 'Math')->value('id');
-        $ReadingSkillId = Skill::where('skill_name', 'Reading')->value('id');
-        $creativitySkillId = Skill::where('skill_name', 'Creativity')->value('id');
-
-        // Example visualizations for Parent ID 1
         AiVisualization::create([
-            'parent_id' => 1,
-            'skill_id' => $MathSkillId,
-            'theme' => 'Problem Solving',
-            'prompt' => 'Tell a story about a child learning to solve puzzles.',
-            'generated_story' => 'This is a simulated story about Critical Thinking and Problem Solving based on the prompt: Tell a story about a child learning to solve puzzles.',
+            'child_id' => 1,
+            'skill_id' => 1,
+            'story' => 'Once upon a time, a brave adventurer solved the hardest puzzles to save their village.',
+            'challenges' => json_encode([
+                [
+                    'question' => 'What is 5 + 7?',
+                    'answer' => '12',
+                ],
+                [
+                    'question' => 'Rearrange these letters to form a word: O P E H',
+                    'answer' => 'HOPE',
+                ],
+            ]),
+            'interaction_data' => json_encode([
+                [
+                    'challenge_id' => 1,
+                    'child_answer' => '12',
+                    'is_correct' => true,
+                ],
+                [
+                    'challenge_id' => 2,
+                    'child_answer' => 'HOPE',
+                    'is_correct' => true,
+                ],
+            ]),
+            'progress_percentage' => 50,
         ]);
 
         AiVisualization::create([
-            'parent_id' => 1,
-            'skill_id' => $ReadingSkillId,
-            'theme' => 'Collaboration',
-            'prompt' => 'Create a story about kids working together to build a treehouse.',
-            'generated_story' => 'This is a simulated story about Teamwork and Collaboration based on the prompt: Create a story about kids working together to build a treehouse.',
+            'child_id' => 2,
+            'skill_id' => 2,
+            'story' => 'A young scientist learned about the stars and made a groundbreaking discovery.',
+            'challenges' => json_encode([
+                [
+                    'question' => 'What planet is known as the Red Planet?',
+                    'answer' => 'Mars',
+                ],
+                [
+                    'question' => 'Which gas do plants use for photosynthesis?',
+                    'answer' => 'Carbon Dioxide',
+                ],
+            ]),
+            'interaction_data' => json_encode([
+                [
+                    'challenge_id' => 1,
+                    'child_answer' => 'Mars',
+                    'is_correct' => true,
+                ],
+                [
+                    'challenge_id' => 2,
+                    'child_answer' => 'Oxygen',
+                    'is_correct' => false,
+                ],
+            ]),
+            'progress_percentage' => 75,
         ]);
 
-        // Example visualizations for Parent ID 2
         AiVisualization::create([
-            'parent_id' => 2,
-            'skill_id' => $creativitySkillId,
-            'theme' => 'Art and Design',
-            'prompt' => 'Write a story about a young artist designing their first mural.',
-            'generated_story' => 'This is a simulated story about Creativity and Art and Design based on the prompt: Write a story about a young artist designing their first mural.',
+            'child_id' => 3,
+            'skill_id' => 3,
+            'story' => 'An artist created beautiful paintings that inspired the whole world.',
+            'challenges' => json_encode([
+                [
+                    'question' => 'What colors do you mix to make purple?',
+                    'answer' => 'Red and Blue',
+                ],
+            ]),
+            'interaction_data' => json_encode([
+                [
+                    'challenge_id' => 1,
+                    'child_answer' => 'Red and Blue',
+                    'is_correct' => true,
+                ],
+            ]),
+            'progress_percentage' => 100,
         ]);
-
-    
     }
 }
