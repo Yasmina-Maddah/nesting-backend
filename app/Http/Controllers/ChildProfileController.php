@@ -3,27 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Models\ChildrenProfile;
-use App\Models\MoodBoard;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ChildProfileController extends Controller
 {
-    /**
-     * Create a new child profile.
-     */
+    // Create Child Profile
     public function store(Request $request)
-{
-    $request->validate([
-        'parent_id' => 'required|exists:users,id', // Validate parent_id instead of user_id
-        'name' => 'required|string|max:255',
-        'date_of_birth' => 'required|date',
-        'hobbies' => 'nullable|string',
-        'dream_career' => 'nullable|string',
-    ]);
+    {
+        $user = Auth::user();
 
-    try {
+        if (!$user || $user->user_type !== 'parent') {
+            return response()->json(['error' => 'Unauthorized access'], 403);
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'date_of_birth' => 'required|date',
+            'hobbies' => 'nullable|string',
+            'dream_career' => 'nullable|string',
+        ]);
+
         $child = ChildrenProfile::create([
-            'parent_id' => $request->parent_id, // Use parent_id
+            'parent_id' => $user->id,
             'name' => $request->name,
             'date_of_birth' => $request->date_of_birth,
             'hobbies' => $request->hobbies,
@@ -32,111 +35,215 @@ class ChildProfileController extends Controller
 
         return response()->json([
             'message' => 'Child profile created successfully',
-            'child_id' => $child->id,
+            'child' => [
+                'id' => $child->id,
+                'name' => $child->name,
+                'date_of_birth' => $child->date_of_birth,
+                'hobbies' => $child->hobbies,
+                'dream_career' => $child->dream_career,
+                'profile_photo' => $child->profile_photo ? asset("storage/{$child->profile_photo}") : null,
+                'cover_photo' => $child->cover_photo ? asset("storage/{$child->cover_photo}") : null,
+            ],
         ], 201);
-    } catch (\Exception $e) {
-        return response()->json([
-            'error' => 'Failed to create child profile',
-            'details' => $e->getMessage(),
-        ], 500);
     }
-}
 
+    // Retrieve All Child Profiles for the Authenticated Parent
+    public function index()
+    {
+        $user = Auth::user();
 
-    /**
-     * View a specific child profile.
-     */
+        if (!$user || $user->user_type !== 'parent') {
+            return response()->json(['error' => 'Unauthorized access'], 403);
+        }
+
+        $children = ChildrenProfile::where('parent_id', $user->id)->get();
+
+        return response()->json(['children' => $children->map(function ($child) {
+            return [
+                'id' => $child->id,
+                'name' => $child->name,
+                'date_of_birth' => $child->date_of_birth,
+                'hobbies' => $child->hobbies,
+                'dream_career' => $child->dream_career,
+                'profile_photo' => $child->profile_photo ? asset("storage/{$child->profile_photo}") : null,
+                'cover_photo' => $child->cover_photo ? asset("storage/{$child->cover_photo}") : null,
+            ];
+        })]);
+    }
+
+    // Retrieve Single Child Profile
     public function show($id)
     {
-        $child = ChildrenProfile::with('moodBoards')->findOrFail($id);
-        return response()->json($child, 200);
+        $user = Auth::user();
+
+        if (!$user || $user->user_type !== 'parent') {
+            return response()->json(['error' => 'Unauthorized access'], 403);
+        }
+
+        $child = ChildrenProfile::where('parent_id', $user->id)->where('id', $id)->first();
+
+        if (!$child) {
+            return response()->json(['error' => 'Child profile not found'], 404);
+        }
+
+        return response()->json([
+            'child' => [
+                'id' => $child->id,
+                'name' => $child->name,
+                'date_of_birth' => $child->date_of_birth,
+                'hobbies' => $child->hobbies,
+                'dream_career' => $child->dream_career,
+                'profile_photo' => $child->profile_photo ? asset("storage/{$child->profile_photo}") : null,
+                'cover_photo' => $child->cover_photo ? asset("storage/{$child->cover_photo}") : null,
+            ],
+        ]);
     }
 
-    /**
-     * Update a child profile.
-     */
+    // Update Child Profile
     public function update(Request $request, $id)
     {
-        $child = ChildrenProfile::findOrFail($id);
+        $user = Auth::user();
+
+        if (!$user || $user->user_type !== 'parent') {
+            return response()->json(['error' => 'Unauthorized access'], 403);
+        }
+
+        $child = ChildrenProfile::where('parent_id', $user->id)->where('id', $id)->first();
+
+        if (!$child) {
+            return response()->json(['error' => 'Child profile not found'], 404);
+        }
 
         $request->validate([
-            'name' => 'nullable|string|max:255',
-            'date_of_birth' => 'nullable|date',
+            'name' => 'string|max:255',
+            'date_of_birth' => 'date',
             'hobbies' => 'nullable|string',
             'dream_career' => 'nullable|string',
         ]);
 
         $child->update($request->only(['name', 'date_of_birth', 'hobbies', 'dream_career']));
 
-        return response()->json(['message' => 'Child profile updated successfully', 'data' => $child], 200);
+        return response()->json([
+            'message' => 'Child profile updated successfully',
+            'child' => [
+                'id' => $child->id,
+                'name' => $child->name,
+                'date_of_birth' => $child->date_of_birth,
+                'hobbies' => $child->hobbies,
+                'dream_career' => $child->dream_career,
+                'profile_photo' => $child->profile_photo ? asset("storage/{$child->profile_photo}") : null,
+                'cover_photo' => $child->cover_photo ? asset("storage/{$child->cover_photo}") : null,
+            ],
+        ]);
     }
 
-    /**
-     * Delete a child profile.
-     */
-    public function destroy($id)
-    {
-        $child = ChildrenProfile::findOrFail($id);
-        $child->delete();
-
-        return response()->json(['message' => 'Child profile deleted successfully'], 200);
-    }
-
-    /**
-     * Upload a cover photo for a child profile.
-     */
+    // Upload/Update Cover Photo
     public function uploadCoverPhoto(Request $request, $id)
     {
+        $user = Auth::user();
+
+        if (!$user || $user->user_type !== 'parent') {
+            return response()->json(['error' => 'Unauthorized access'], 403);
+        }
+
+        $child = ChildrenProfile::where('parent_id', $user->id)->where('id', $id)->first();
+
+        if (!$child) {
+            return response()->json(['error' => 'Child profile not found'], 404);
+        }
+
         $request->validate([
             'cover_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $child = ChildrenProfile::findOrFail($id);
+        if ($child->cover_photo) {
+            Storage::disk('public')->delete($child->cover_photo);
+        }
 
         $path = $request->file('cover_photo')->store('cover_photos', 'public');
         $child->cover_photo = $path;
         $child->save();
 
-        return response()->json(['message' => 'Cover photo uploaded successfully', 'path' => $path], 200);
+        return response()->json([
+            'message' => 'Cover photo updated successfully',
+            'child' => [
+                'id' => $child->id,
+                'name' => $child->name,
+                'date_of_birth' => $child->date_of_birth,
+                'hobbies' => $child->hobbies,
+                'dream_career' => $child->dream_career,
+                'profile_photo' => $child->profile_photo ? asset("storage/{$child->profile_photo}") : null,
+                'cover_photo' => asset("storage/{$child->cover_photo}"),
+            ],
+        ]);
     }
 
-    /**
-     * Upload a profile photo for a child profile.
-     */
+    // Upload/Update Profile Photo
     public function uploadProfilePhoto(Request $request, $id)
     {
+        $user = Auth::user();
+
+        if (!$user || $user->user_type !== 'parent') {
+            return response()->json(['error' => 'Unauthorized access'], 403);
+        }
+
+        $child = ChildrenProfile::where('parent_id', $user->id)->where('id', $id)->first();
+
+        if (!$child) {
+            return response()->json(['error' => 'Child profile not found'], 404);
+        }
+
         $request->validate([
             'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $child = ChildrenProfile::findOrFail($id);
+        if ($child->profile_photo) {
+            Storage::disk('public')->delete($child->profile_photo);
+        }
 
         $path = $request->file('profile_photo')->store('profile_photos', 'public');
         $child->profile_photo = $path;
         $child->save();
 
-        return response()->json(['message' => 'Profile photo uploaded successfully', 'path' => $path], 200);
+        return response()->json([
+            'message' => 'Profile photo updated successfully',
+            'child' => [
+                'id' => $child->id,
+                'name' => $child->name,
+                'date_of_birth' => $child->date_of_birth,
+                'hobbies' => $child->hobbies,
+                'dream_career' => $child->dream_career,
+                'profile_photo' => asset("storage/{$child->profile_photo}"),
+                'cover_photo' => $child->cover_photo ? asset("storage/{$child->cover_photo}") : null,
+            ],
+        ]);
     }
 
-    /**
-     * Add a mood board for a child profile.
-     */
-    public function addMoodBoard(Request $request, $id)
+    // Delete Child Profile
+    public function destroy($id)
     {
-        $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'description' => 'nullable|string',
-        ]);
+        $user = Auth::user();
 
-        $child = ChildrenProfile::findOrFail($id);
+        if (!$user || $user->user_type !== 'parent') {
+            return response()->json(['error' => 'Unauthorized access'], 403);
+        }
 
-        $path = $request->file('image')->store('mood_boards', 'public');
+        $child = ChildrenProfile::where('parent_id', $user->id)->where('id', $id)->first();
 
-        $moodBoard = $child->moodBoards()->create([
-            'image' => $path,
-            'description' => $request->description,
-        ]);
+        if (!$child) {
+            return response()->json(['error' => 'Child profile not found'], 404);
+        }
 
-        return response()->json(['message' => 'Mood board added successfully', 'data' => $moodBoard], 201);
+        if ($child->profile_photo) {
+            Storage::disk('public')->delete($child->profile_photo);
+        }
+
+        if ($child->cover_photo) {
+            Storage::disk('public')->delete($child->cover_photo);
+        }
+
+        $child->delete();
+
+        return response()->json(['message' => 'Child profile deleted successfully']);
     }
 }

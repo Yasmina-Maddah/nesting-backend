@@ -24,15 +24,17 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::prefix('child-profile')->group(function () {
-    Route::post('/', [ChildProfileController::class, 'store']); // Create a child profile
-    Route::get('/{id}', [ChildProfileController::class, 'show']); // View a child profile
-    Route::put('/{id}', [ChildProfileController::class, 'update']); // Update a child profile
-    Route::delete('/{id}', [ChildProfileController::class, 'destroy']); // Delete a child profile
-    Route::post('/{id}/upload-cover-photo', [ChildProfileController::class, 'uploadCoverPhoto']); // Upload cover photo
-    Route::post('/{id}/upload-profile-photo', [ChildProfileController::class, 'uploadProfilePhoto']); // Upload profile photo
-    Route::post('/{id}/mood-board', [ChildProfileController::class, 'addMoodBoard']); // Add a mood board
+
+Route::middleware(['auth:api'])->group(function () {
+    Route::post('/child-profile', [ChildProfileController::class, 'store']); // Create child profile
+    Route::get('/child-profile', [ChildProfileController::class, 'index']); // Get all child profiles
+    Route::get('/child-profile/{id}', [ChildProfileController::class, 'show']); // Get single child profile
+    Route::put('/child-profile/{id}', [ChildProfileController::class, 'update']); // Update child profile
+    Route::delete('/child-profile/{id}', [ChildProfileController::class, 'destroy']); // Delete child profile
+    Route::post('/child-profile/{id}/upload-cover-photo', [ChildProfileController::class, 'uploadCoverPhoto']); // Add/Update cover photo
+    Route::post('/child-profile/{id}/upload-profile-photo', [ChildProfileController::class, 'uploadProfilePhoto']); // Add/Update profile photo
 });
+
 
 
 Route::middleware('auth:api')->get('/user', [AuthController::class, 'getUser']);
