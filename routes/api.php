@@ -10,6 +10,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AiVisualizationController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\ProgressReportController;
+use App\Http\Controllers\ChildProfileController;
 
 
 
