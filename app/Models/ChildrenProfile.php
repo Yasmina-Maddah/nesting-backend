@@ -22,9 +22,10 @@ class ChildrenProfile extends Model
     }
 
     public function moodBoards()
-    {
-        return $this->hasMany(MoodBoard::class, 'child_profile_id');
-    }
+{
+    return $this->hasMany(MoodBoard::class);
+}
+
 
     public function childSkills()
     {
