@@ -22,23 +22,14 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::prefix('profile')->group(function () {
-    Route::get('{id}', [ProfileController::class, 'showProfile']);
-    Route::put('{id}', [ProfileController::class, 'updateProfile']);
-    Route::post('{id}/photo', [ProfileController::class, 'uploadProfilePhoto']);
-    Route::post('{id}/cover', [ProfileController::class, 'uploadCoverPhoto']);
-    
-    Route::prefix('customization')->group(function () {
-        Route::get('{id}', [CustomizationController::class, 'getCustomization']);
-        Route::put('{id}', [CustomizationController::class, 'updateCustomization']);
-    });
 
-    Route::prefix('{childProfileId}/mood-board')->group(function () {
-        Route::get('/', [MoodBoardController::class, 'getMoodBoard']);
-        Route::post('/', [MoodBoardController::class, 'createMoodBoard']);
-        Route::delete('{id}', [MoodBoardController::class, 'deleteMoodBoard']);
-    });
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/children-profiles', [ChildProfileController::class, 'store']); // Create a child profile
+    Route::get('/children-profiles/{id}', [ChildProfileController::class, 'show']); // Get a child profile
+    Route::put('/children-profiles/{id}', [ChildProfileController::class, 'update']); // Update a child profile
+    Route::delete('/children-profiles/{id}', [ChildProfileController::class, 'destroy']); // Delete a child profile
 });
+
 
 Route::middleware('auth:api')->get('/user', [AuthController::class, 'getUser']);
 
