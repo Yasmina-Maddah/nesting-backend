@@ -16,8 +16,6 @@ class DatabaseSeeder extends Seeder
             MoodBoardSeeder::class,
             AiVisualizationSeeder::class,
             ProgressReportSeeder::class,
-            ActivitiesSeeder::class,
-            InteractionLogsSeeder::class,
         ]);
     }
 }
