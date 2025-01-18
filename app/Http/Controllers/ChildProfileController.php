@@ -12,25 +12,36 @@ class ChildProfileController extends Controller
      * Create a new child profile.
      */
     public function store(Request $request)
-    {
-        $request->validate([
-            'parent-id' => 'required|exists:users,id',
-            'name' => 'required|string|max:255',
-            'date_of_birth' => 'required|date',
-            'hobbies' => 'nullable|string',
-            'dream_career' => 'nullable|string',
-        ]);
+{
+    $request->validate([
+        'parent_id' => 'required|exists:users,id', // Validate parent_id instead of user_id
+        'name' => 'required|string|max:255',
+        'date_of_birth' => 'required|date',
+        'hobbies' => 'nullable|string',
+        'dream_career' => 'nullable|string',
+    ]);
 
+    try {
         $child = ChildrenProfile::create([
-            'parent-id' => $request->user_id,
+            'parent_id' => $request->parent_id, // Use parent_id
             'name' => $request->name,
             'date_of_birth' => $request->date_of_birth,
             'hobbies' => $request->hobbies,
             'dream_career' => $request->dream_career,
         ]);
 
-        return response()->json(['message' => 'Child profile created successfully', 'data' => $child], 201);
+        return response()->json([
+            'message' => 'Child profile created successfully',
+            'child_id' => $child->id,
+        ], 201);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Failed to create child profile',
+            'details' => $e->getMessage(),
+        ], 500);
     }
+}
+
 
     /**
      * View a specific child profile.
