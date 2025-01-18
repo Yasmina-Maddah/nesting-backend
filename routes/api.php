@@ -23,11 +23,14 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/children-profiles', [ChildProfileController::class, 'store']); // Create a child profile
-    Route::get('/children-profiles/{id}', [ChildProfileController::class, 'show']); // Get a child profile
-    Route::put('/children-profiles/{id}', [ChildProfileController::class, 'update']); // Update a child profile
-    Route::delete('/children-profiles/{id}', [ChildProfileController::class, 'destroy']); // Delete a child profile
+Route::prefix('child-profile')->group(function () {
+    Route::post('/', [ChildProfileController::class, 'store']); // Create a child profile
+    Route::get('/{id}', [ChildProfileController::class, 'show']); // View a child profile
+    Route::put('/{id}', [ChildProfileController::class, 'update']); // Update a child profile
+    Route::delete('/{id}', [ChildProfileController::class, 'destroy']); // Delete a child profile
+    Route::post('/{id}/upload-cover-photo', [ChildProfileController::class, 'uploadCoverPhoto']); // Upload cover photo
+    Route::post('/{id}/upload-profile-photo', [ChildProfileController::class, 'uploadProfilePhoto']); // Upload profile photo
+    Route::post('/{id}/mood-board', [ChildProfileController::class, 'addMoodBoard']); // Add a mood board
 });
 
 
