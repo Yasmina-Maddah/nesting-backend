@@ -13,12 +13,16 @@ return new class extends Migration
     {
         Schema::create('ai_visualizations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('parent_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('skill_id')->constrained('skills')->onDelete('cascade');
-            $table->string('theme');
-            $table->text('prompt');
-            $table->text('generated_story')->nullable();
+            $table->unsignedBigInteger('child_id');
+            $table->unsignedBigInteger('skill_id');
+            $table->text('story');
+            $table->json('challenges')->nullable();
+            $table->json('interaction_data')->nullable();
+            $table->integer('progress_percentage')->nullable();
             $table->timestamps();
+        
+            $table->foreign('child_id')->references('id')->on('children_profiles')->onDelete('cascade');
+            $table->foreign('skill_id')->references('id')->on('skills')->onDelete('cascade');
         });
         
     }
