@@ -67,8 +67,5 @@ class User extends Authenticatable implements JWTSubject
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function aiVisualizations()
-    {
-        return $this->hasMany(AiVisualization::class, 'parent_id');
-    }
+
 }
