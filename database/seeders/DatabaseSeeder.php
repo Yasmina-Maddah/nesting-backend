@@ -11,7 +11,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             ChildrenProfileSeeder::class,
-            SkillSeeder::class,
+            SkillsTableSeeder::class,
             ChildSkillSeeder::class,
             MoodBoardSeeder::class,
             AiVisualizationSeeder::class,
