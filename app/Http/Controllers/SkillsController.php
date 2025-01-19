@@ -40,7 +40,7 @@ class SkillsController extends Controller
 
         return response()->json([
             'message' => 'Skill assigned successfully',
-            'ai_url' => url('/ai/' . $request->child_profile_id . '/' . $request->skill_id),
+            'ai_url' => url('/AIPage/' . $request->child_profile_id . '/' . $request->skill_id),
         ], 201);
     }
 }
