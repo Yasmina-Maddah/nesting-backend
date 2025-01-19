@@ -3,75 +3,111 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\AiVisualization;
-use App\Models\ChildrenProfile;
 use App\Models\Skill;
-use Illuminate\Support\Facades\Http;
+use App\Models\ChildrenProfile;
+use App\Models\ChildInteraction;
+use App\Models\ProgressReport;
+use OpenAI;
 
 class AIController extends Controller
 {
-    private $openAiApiKey = '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';
-
-    public function generateStory(Request $request, $childId)
+    /**
+     * Fetch AI Content (Story, Challenges) for the selected skill
+     */
+    public function fetchAIContent(Request $request)
     {
-        $validated = $request->validate([
-            'prompt' => 'required|string|max:1000',
+        $request->validate([
+            'child_profile_id' => 'required|exists:children_profiles,id',
+            'skill_id' => 'required|exists:skills,id',
         ]);
 
-        $child = ChildrenProfile::find($childId);
-        if (!$child) {
-            return response()->json(['error' => 'Child not found'], 404);
-        }
+        $skill = Skill::find($request->skill_id);
+        $child = ChildrenProfile::find($request->child_profile_id);
 
-        $childSkill = $child->skills()->first();
-        if (!$childSkill) {
-            return response()->json(['error' => 'Child does not have an associated skill'], 404);
-        }
+        // Call OpenAI API
+        $client = OpenAI::client(config('services.openai.api_key'));
 
-        $skill = Skill::find($childSkill->skill_id);
-        if (!$skill) {
-            return response()->json(['error' => 'Skill not found'], 404);
-        }
+        $response = $client->completions()->create([
+            'model' => 'text-davinci-003',
+            'prompt' => "Generate a story and a challenge for a child about {$skill->skill_name}. The child is named {$child->name} and is {$child->date_of_birth->diffInYears(now())} years old.",
+            'max_tokens' => 500,
+        ]);
 
-        $prompt = $validated['prompt'];
+        $generatedContent = $response['choices'][0]['text'];
 
-        try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->openAiApiKey,
-            ])->post('https://api.openai.com/v1/completions', [
-                'model' => 'text-davinci-003',
-                'prompt' => "Create a story for a child with the skill '{$skill->skill_name}'. Theme: {$prompt}. Include three challenges for the child to solve.",
-                'max_tokens' => 1000,
-                'temperature' => 0.7,
-            ]);
+        // Split the content into story and challenges
+        // Assume story and challenges are separated by "---" in the response
+        [$story, $challenges] = explode('---', $generatedContent);
 
-            $aiResponse = $response->json();
+        return response()->json([
+            'story' => trim($story),
+            'challenges' => json_decode(trim($challenges), true), // Decode JSON challenges
+        ]);
+    }
 
-            if (!isset($aiResponse['choices'][0]['text'])) {
-                return response()->json(['error' => 'AI failed to generate a story.'], 500);
-            }
+    /**
+     * Submit Child's Response to a Challenge
+     */
+    public function submitResponse(Request $request)
+    {
+        $request->validate([
+            'child_profile_id' => 'required|exists:children_profiles,id',
+            'skill_id' => 'required|exists:skills,id',
+            'challenge_id' => 'required',
+            'response' => 'required|string',
+        ]);
 
-            $generatedStory = $aiResponse['choices'][0]['text'];
-            $challenges = [
-                'Solve a puzzle related to the theme',
-                'Draw a picture based on the story theme',
-                'Act out a part of the story with friends or family',
-            ];
+        // Assume challenges are stored locally or retrieved dynamically
+        $challenge = ChildInteraction::where('skill_id', $request->skill_id)
+            ->value('challenge'); // Retrieve the relevant challenge
 
-            $aiVisualization = AiVisualization::create([
-                'child_id' => $childId,
-                'skill_id' => $skill->id,
-                'story' => $generatedStory,
-                'challenges' => $challenges,
-                'progress_percentage' => 0,
-            ]);
+        $isCorrect = $challenge[$request->challenge_id]['correct_option'] === $request->response;
 
-            return response()->json([
-                'message' => 'Story generated successfully!',
-                'ai_visualization' => $aiVisualization,
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Error communicating with OpenAI.'], 500);
-        }
+        // Record the interaction
+        ChildInteraction::create([
+            'child_id' => $request->child_profile_id,
+            'skill_id' => $request->skill_id,
+            'challenge_id' => $request->challenge_id,
+            'response' => $request->response,
+            'is_correct' => $isCorrect,
+        ]);
+
+        return response()->json([
+            'message' => 'Response submitted successfully',
+            'is_correct' => $isCorrect,
+        ]);
+    }
+
+    /**
+     * Generate Progress Report for a Child and a Skill
+     */
+    public function generateProgressReport(Request $request)
+    {
+        $request->validate([
+            'child_profile_id' => 'required|exists:children_profiles,id',
+            'skill_id' => 'required|exists:skills,id',
+        ]);
+
+        $interactions = ChildInteraction::where('child_id', $request->child_profile_id)
+            ->where('skill_id', $request->skill_id)
+            ->get();
+
+        $totalChallenges = $interactions->count();
+        $correctAnswers = $interactions->where('is_correct', true)->count();
+        $progressScore = $totalChallenges > 0 ? round(($correctAnswers / $totalChallenges) * 100) : 0;
+
+        // Save the progress report
+        ProgressReport::create([
+            'child_id' => $request->child_profile_id,
+            'skill_id' => $request->skill_id,
+            'interaction_summary' => $interactions,
+            'progress_score' => $progressScore,
+        ]);
+
+        return response()->json([
+            'total_challenges' => $totalChallenges,
+            'correct_answers' => $correctAnswers,
+            'progress_score' => $progressScore,
+        ]);
     }
 }
