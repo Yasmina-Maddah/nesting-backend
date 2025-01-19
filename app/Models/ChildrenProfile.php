@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ChildrenProfile extends Model
+class ChildProfile extends Model
 {
     use HasFactory;
 
@@ -20,10 +20,5 @@ class ChildrenProfile extends Model
     public function parent()
     {
         return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function skills()
-    {
-        return $this->hasMany(ChildSkill::class, 'child_id');
     }
 }
