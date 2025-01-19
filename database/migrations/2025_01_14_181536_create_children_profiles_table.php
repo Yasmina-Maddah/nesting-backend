@@ -12,17 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('children_profiles', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('parent_id')->constrained('users')->onDelete('cascade');
-            $table->string('name');
-            $table->string('profile_photo')->nullable();
-            $table->string('cover_photo')->nullable();
-            $table->date('date_of_birth')->nullable(); 
-            $table->text('hobbies')->nullable(); 
-            $table->string('dream_career')->nullable(); 
-            $table->boolean('archived')->default(false);
-            $table->timestamps();
-        });
+                $table->id('child_id');
+                $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+                $table->string('name', 100);
+                $table->date('date_of_birth');
+                $table->text('hobbies')->nullable();
+                $table->string('dream_job', 100)->nullable();
+                $table->timestamps();
+            });
     }
 
     /**
