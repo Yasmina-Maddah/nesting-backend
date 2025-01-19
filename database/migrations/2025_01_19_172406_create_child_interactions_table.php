@@ -12,7 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('child_interactions', function (Blueprint $table) {
-            $table->id();
+            $table->id('interaction_id');
+            $table->foreignId('child_id')->constrained('child_profiles')->onDelete('cascade');
+            $table->foreignId('visualization_id')->constrained('ai_visualizations')->onDelete('cascade');
+            $table->text('response')->nullable();
+            $table->boolean('is_correct')->default(false);
             $table->timestamps();
         });
     }
