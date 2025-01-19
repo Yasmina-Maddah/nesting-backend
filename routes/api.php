@@ -4,10 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChildrenProfileController;
-use App\Http\Controllers\CustomizationController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SkillsController;
-use App\Http\Controllers\ProgressReportController;
+use App\Http\Controllers\AIController;
 
 
 
@@ -35,5 +33,11 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/assign-skill', [SkillsController::class, 'assignSkill']); // Assign skill
 });
 
-Route::post('/child/{id}/generate-report', [ProgressReportController::class, 'generateReport']);
-Route::get('/child/{id}/report', [ProgressReportController::class, 'getReport']);
+
+Route::middleware('auth:api')->group(function () {
+    Route::get('/ai-content', [AIController::class, 'fetchAIContent']);
+    Route::post('/submit-response', [AIController::class, 'submitResponse']);
+    Route::get('/progress-report', [AIController::class, 'generateProgressReport']);
+});
+
+
