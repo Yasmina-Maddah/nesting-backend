@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('skills', function (Blueprint $table) {
-            $table->id();
-            $table->string('skill_name')->unique();
-            $table->text('description')->nullable();
-            $table->string('image_path')->nullable();
-            $table->foreignId('parent_skill_id')->nullable()->constrained('skills')->onDelete('set null');
-            $table->timestamps();
+            Schema::create('skills', function (Blueprint $table) {
+                $table->id('skill_id');
+                $table->string('skill_name', 100)->unique();
+                $table->text('description')->nullable();
+                $table->timestamps();
+            });
         });
         
     }
