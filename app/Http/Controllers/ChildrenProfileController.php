@@ -39,7 +39,7 @@ class ChildrenProfileController extends Controller
         return response()->json([
             'message' => 'Child profile created successfully',
             'profile' => $profile,
-            'skills_url' => url('/skills/' . $profile->id), // Generates the URL for the skills page
+            'skills_url' => url('/SkillSuggestionPage/' . $profile->id), // Generates the URL for the skills page
         ], 201);
     }
 
