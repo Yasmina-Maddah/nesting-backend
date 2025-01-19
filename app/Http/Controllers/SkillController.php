@@ -9,39 +9,39 @@ use Illuminate\Http\Request;
 
 class SkillController extends Controller
 {
-    public function selectSkill(Request $request, $id)
-    {
-        $validated = $request->validate([
-            'skill_id' => 'required|exists:skills,id',
-        ]);
+    public function selectSkill(Request $request, $childId)
+{
+    $validated = $request->validate([
+        'skill_id' => 'required|exists:skills,id',
+    ]);
 
-        $skillId = $validated['skill_id'];
-
-        // Ensure child exists
-        $child = ChildrenProfile::find($id);
-        if (!$child) {
-            return response()->json(['error' => 'Child not found'], 404);
-        }
-
-        // Check if the skill is already assigned
-        $existingSkill = ChildSkill::where('child_id', $id)
-            ->where('skill_id', $skillId)
-            ->first();
-
-        if ($existingSkill) {
-            return response()->json(['message' => 'Skill already assigned'], 200);
-        }
-
-        // Assign the skill to the child
-        $childSkill = ChildSkill::create([
-            'child_id' => $id,
-            'skill_id' => $skillId,
-            'progress' => 0, // Default progress
-        ]);
-
-        return response()->json([
-            'message' => 'Skill selected successfully',
-            'child_skill' => $childSkill,
-        ], 201);
+    $child = ChildrenProfile::find($childId);
+    if (!$child) {
+        return response()->json(['error' => 'Child not found'], 404);
     }
+
+    $skillId = $validated['skill_id'];
+
+    // Check if skill is already assigned
+    $existingSkill = ChildSkill::where('child_id', $childId)
+        ->where('skill_id', $skillId)
+        ->first();
+
+    if ($existingSkill) {
+        return response()->json(['message' => 'Skill already assigned'], 200);
+    }
+
+    // Assign skill
+    $childSkill = ChildSkill::create([
+        'child_id' => $childId,
+        'skill_id' => $skillId,
+        'progress' => 0,
+    ]);
+
+    return response()->json([
+        'message' => 'Skill selected successfully',
+        'child_skill' => $childSkill,
+    ], 201);
+}
+
 }
