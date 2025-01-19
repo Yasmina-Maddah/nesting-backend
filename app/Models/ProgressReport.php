@@ -18,7 +18,7 @@ class ProgressReport extends Model
 
     public function child()
     {
-        return $this->belongsTo(ChildProfile::class, 'child_id');
+        return $this->belongsTo(ChildrenProfile::class, 'child_id');
     }
 
     public function skill()
