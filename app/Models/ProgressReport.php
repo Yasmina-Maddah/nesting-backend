@@ -9,15 +9,20 @@ class ProgressReport extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['child_skill_id', 'progress_entry', 'details'];
-
-    protected $casts = [
-        'details' => 'array',
+    protected $fillable = [
+        'child_id',
+        'skill_id',
+        'interaction_summary',
+        'progress_score',
     ];
 
-    public function childSkill()
+    public function child()
     {
-        return $this->belongsTo(ChildSkill::class, 'child_skill_id');
+        return $this->belongsTo(ChildProfile::class, 'child_id');
+    }
+
+    public function skill()
+    {
+        return $this->belongsTo(Skill::class, 'skill_id');
     }
 }
-
