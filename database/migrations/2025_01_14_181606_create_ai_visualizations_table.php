@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('ai_visualizations', function (Blueprint $table) {
-            $table->id('visualization_id');
+            $table->id();
             $table->foreignId('child_skill_id')->constrained('child_skills')->onDelete('cascade');
             $table->text('story_text');
             $table->string('visualization_path', 255)->nullable();
