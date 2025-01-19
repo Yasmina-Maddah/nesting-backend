@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('progress_reports', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('child_skill_id')->constrained('child_skills')->onDelete('cascade');
-            $table->integer('progress_entry');
-            $table->json('details')->nullable();
+            $table->id('report_id');
+            $table->foreignId('child_id')->constrained('child_profiles')->onDelete('cascade');
+            $table->foreignId('skill_id')->constrained('skills')->onDelete('cascade');
+            $table->text('interaction_summary')->nullable();
+            $table->integer('progress_score');
             $table->timestamps();
         });
-        
     }
 
     /**
