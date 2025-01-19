@@ -40,7 +40,7 @@ Route::middleware('auth:api')->get('/user', [AuthController::class, 'getUser']);
 
 Route::post('/child/{id}/skill/select', [SkillController::class, 'selectSkill']); // Skill selection
 
-Route::post('/child/{childId}/generate-story', [AIController::class, 'generateStoryAndChallenges']);
+Route::post('/child/{childId}/generate-story', [AIController::class, 'generateStory']);
 
 
 Route::post('/child/{id}/generate-report', [ProgressReportController::class, 'generateReport']);
