@@ -59,7 +59,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function childrenProfiles()
     {
-        return $this->hasMany(ChildrenProfile::class, 'parent_id');
+        return $this->hasMany(ChildrenProfile::class, 'user_id');
     }
 
     /**
