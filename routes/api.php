@@ -6,7 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChildrenProfileController;
 use App\Http\Controllers\CustomizationController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\SkillController;
+use App\Http\Controllers\SkillsController;
 use App\Http\Controllers\ProgressReportController;
 
 
@@ -30,7 +30,10 @@ Route::middleware('auth:api')->group(function () {
 
 Route::post('/child/{id}/skill/select', [SkillController::class, 'selectSkill']); // Skill selection
 
-
+Route::middleware('auth:api')->group(function () {
+    Route::get('/skills', [SkillsController::class, 'fetchSkills']); // Fetch skills
+    Route::post('/assign-skill', [SkillsController::class, 'assignSkill']); // Assign skill
+});
 
 Route::post('/child/{id}/generate-report', [ProgressReportController::class, 'generateReport']);
 Route::get('/child/{id}/report', [ProgressReportController::class, 'getReport']);
