@@ -9,11 +9,14 @@ class ChildSkill extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['child_id', 'skill_id', 'progress'];
+    protected $fillable = [
+        'child_id',
+        'skill_id',
+    ];
 
     public function child()
     {
-        return $this->belongsTo(ChildrenProfile::class, 'child_id');
+        return $this->belongsTo(ChildProfile::class, 'child_id');
     }
 
     public function skill()
@@ -21,19 +24,8 @@ class ChildSkill extends Model
         return $this->belongsTo(Skill::class, 'skill_id');
     }
 
-    public function progressReports()
+    public function visualizations()
     {
-        return $this->hasMany(ProgressReport::class);
-    }
-
-    public function activities()
-    {
-        return $this->hasMany(Activity::class, 'child_skill_id');
-    }
-
-    public function skills()
-    {
-    return $this->belongsToMany(Skill::class, 'child_skills', 'child_id', 'skill_id')
-                ->withPivot('id', 'progress');
+        return $this->hasMany(AIVisualization::class, 'child_skill_id');
     }
 }
