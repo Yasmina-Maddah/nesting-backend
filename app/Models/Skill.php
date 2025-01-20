@@ -9,6 +9,9 @@ class Skill extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'id';
+
+
     protected $fillable = [
         'skill_name',
         'description',

@@ -26,8 +26,11 @@ Route::middleware('auth:api')->group(function () {
 });
 
 Route::middleware('auth:api')->group(function () {
-    Route::get('/skills', [SkillsController::class, 'fetchSkills']); // Fetch skills
-    Route::post('/assign-skill', [SkillsController::class, 'assignSkill']); // Assign skill
+    Route::get('/skills', [SkillsController::class, 'fetchSkills']); // Fetch all skill categories
+    Route::post('/skills/assign', [SkillsController::class, 'assignSkill']); // Assign skill to a child
+    Route::get('/skills/assigned/{children_id}', [SkillsController::class, 'fetchAssignedSkill']); // Fetch assigned skill
+    Route::put('/skills/update', [SkillsController::class, 'updateAssignedSkill']); // Update assigned skill
+    Route::delete('/skills/remove/{children_id}', [SkillsController::class, 'removeAssignedSkill']); // Remove assigned skill
 });
 
 

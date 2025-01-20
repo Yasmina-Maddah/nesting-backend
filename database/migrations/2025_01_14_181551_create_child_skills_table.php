@@ -11,7 +11,7 @@ class CreateChildSkillsTable extends Migration
         Schema::create('child_skills', function (Blueprint $table) {
             $table->id(); // Primary key
             $table->foreignId('child_id')->constrained('children_profiles')->onDelete('cascade');
-            $table->foreignId('skill_id')->constrained('skills')->onDelete('cascade');
+            $table->foreignId('skill_id')->references('id')->on('skills')->onDelete('cascade');
             $table->timestamps();
         });
     }
