@@ -10,7 +10,6 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    // Signup API
     public function signup(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -39,7 +38,6 @@ class AuthController extends Controller
         ], 201);
     }
 
-    // Login API
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -54,7 +52,6 @@ class AuthController extends Controller
         ]);
     }
 
-    // Get Authenticated User
     public function getUser()
     {
         try {
