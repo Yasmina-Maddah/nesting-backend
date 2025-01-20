@@ -10,7 +10,6 @@ use Carbon\Carbon;
 
 class ChildrenProfileController extends Controller
 {
-    // Create Profile
     public function createProfile(Request $request)
     {
         $request->validate([
@@ -20,7 +19,6 @@ class ChildrenProfileController extends Controller
             'dream_job' => 'nullable|string',
         ]);
 
-        // Check child's age is between 3 and 7
         $birthDate = Carbon::parse($request->date_of_birth);
         $age = $birthDate->age;
 
@@ -39,11 +37,10 @@ class ChildrenProfileController extends Controller
         return response()->json([
             'message' => 'Child profile created successfully',
             'profile' => $profile,
-            'skills_url' => url('http://localhost:3000/Skills' . $profile->id), // Generates the URL for the skills page
+            'skills_url' => url('http://localhost:3000/Skills' . $profile->id), 
         ], 201);
     }
 
-    // Get All Profiles
     public function getProfiles()
     {
         $profiles = ChildrenProfile::where('user_id', Auth::id())->get();
@@ -51,7 +48,6 @@ class ChildrenProfileController extends Controller
         return response()->json(['profiles' => $profiles]);
     }
 
-    // Update Profile
     public function updateProfile(Request $request, $id)
     {
         $profile = ChildrenProfile::where('id', $id)->where('user_id', Auth::id())->first();
@@ -68,7 +64,6 @@ class ChildrenProfileController extends Controller
         ]);
     }
 
-    // Delete Profile
     public function deleteProfile($id)
     {
         $profile = ChildrenProfile::where('id', $id)->where('user_id', Auth::id())->first();
