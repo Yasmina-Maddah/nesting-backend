@@ -14,7 +14,7 @@ class ChildrenProfile extends Model
     protected $fillable = ['name', 'date_of_birth', 'hobbies', 'dream_job', 'user_id'];
 
     protected $casts = [
-        'date_of_birth' => 'date', // Ensure date_of_birth is cast as a Carbon date
+        'date_of_birth' => 'date', 
     ];
 
     public function parent()
