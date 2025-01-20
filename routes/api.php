@@ -14,10 +14,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::middleware('auth:api')->get('/user', [AuthController::class, 'getUser']);
 
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-
+Route::post('/child/{id}/skill/select', [SkillController::class, 'selectSkill']); // Skill selection
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/profiles', [ChildrenProfileController::class, 'createProfile']);
@@ -25,8 +22,6 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/profiles/{id}', [ChildrenProfileController::class, 'updateProfile']);
     Route::delete('/profiles/{id}', [ChildrenProfileController::class, 'deleteProfile']);
 });
-
-Route::post('/child/{id}/skill/select', [SkillController::class, 'selectSkill']); // Skill selection
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/skills', [SkillsController::class, 'fetchSkills']); // Fetch skills
