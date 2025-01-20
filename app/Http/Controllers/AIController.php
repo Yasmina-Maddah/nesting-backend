@@ -15,35 +15,74 @@ class AIController extends Controller
      * Fetch AI Content (Story, Challenges) for the selected skill
      */
     public function fetchAIContent(Request $request)
-    {
-        $request->validate([
-            'child_profile_id' => 'required|exists:children_profiles,id',
-            'skill_id' => 'required|exists:skills,id',
-        ]);
+{
+    // Validate request inputs
+    $request->validate([
+        'child_profile_id' => 'required|exists:children_profiles,id',
+        'skill_id' => 'required|exists:skills,id',
+    ]);
 
-        $skill = Skill::find($request->skill_id);
-        $child = ChildrenProfile::find($request->child_profile_id);
+    // Fetch related data
+    $skill = Skill::find($request->skill_id);
+    $child = ChildrenProfile::find($request->child_profile_id);
+    $childAge = $child->age;
 
-        // Call OpenAI API
-        $client = OpenAI::client(config('services.openai.api_key'));
+    // OpenAI API client setup
+    $client = OpenAI::client(config('services.openai.api_key'));
 
-        $response = $client->completions()->create([
-            'model' => 'text-davinci-003',
-            'prompt' => "Generate a story and a challenge for a child about {$skill->skill_name}. The child is named {$child->name} and is {$child->date_of_birth->diffInYears(now())} years old.",
+    try {
+        // Call OpenAI API with enhanced prompt
+        $response = $client->chat()->create([
+            'model' => 'gpt-4',
+            'messages' => [
+                [
+                    'role' => 'system',
+                    'content' => 'You are an assistant generating child-friendly stories and challenges. Format challenges as valid JSON.',
+                ],
+                [
+                    'role' => 'user',
+                    'content' => "Generate a story and a JSON-formatted challenge for a child named {$child->name}, who is {$childAge} years old. The theme is based on the skill '{$skill->skill_name}'. Use the following format:\n\nStory: [Story text here]\n---\nChallenges: [{\"id\":1,\"description\":\"Challenge description\",\"skills_to_use\":[\"Skill 1\",\"Skill 2\"],\"completion_time\":\"Time required\"}]. Only return the JSON challenges array with valid syntax."
+                ],
+            ],
             'max_tokens' => 500,
         ]);
+         
 
-        $generatedContent = $response['choices'][0]['text'];
+        // Extract the generated content
+        $generatedContent = $response['choices'][0]['message']['content'] ?? '';
+
+        // Validate the response format
+        if (!$generatedContent || strpos($generatedContent, '---') === false) {
+            throw new \Exception('Invalid AI response format');
+        }
 
         // Split the content into story and challenges
-        // Assume story and challenges are separated by "---" in the response
         [$story, $challenges] = explode('---', $generatedContent);
+        
+        // Clean and decode the challenges
+        $challenges = trim($challenges);
+        $challenges = preg_replace('/[^\x20-\x7E]/', '', $challenges); // Remove invalid characters
+        $challenges = str_replace(['“', '”', '’'], ['"', '"', "'"], $challenges); // Replace curly quotes
+        $challenges = preg_replace('/,\s*}/', '}', $challenges); // Remove trailing commas
+        $challenges = json_decode($challenges, true);
 
+        // Check for JSON decoding errors
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            Log::error('Cleaned Challenges Content: ' . $challenges);
+            throw new \Exception('Invalid JSON in challenges');
+        }
+
+        // Return the parsed response
         return response()->json([
             'story' => trim($story),
-            'challenges' => json_decode(trim($challenges), true), // Decode JSON challenges
+            'challenges' => $challenges,
         ]);
+    } catch (\Exception $e) {
+        // Log the error for debugging
+        return response()->json(['error' => $e->getMessage()], 500);
     }
+}
+
 
     /**
      * Submit Child's Response to a Challenge
@@ -57,9 +96,8 @@ class AIController extends Controller
             'response' => 'required|string',
         ]);
 
-        // Assume challenges are stored locally or retrieved dynamically
         $challenge = ChildInteraction::where('skill_id', $request->skill_id)
-            ->value('challenge'); // Retrieve the relevant challenge
+            ->value('challenge');
 
         $isCorrect = $challenge[$request->challenge_id]['correct_option'] === $request->response;
 
