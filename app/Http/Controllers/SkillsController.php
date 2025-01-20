@@ -10,14 +10,12 @@ use Illuminate\Support\Facades\Auth;
 
 class SkillsController extends Controller
 {
-    // Fetch all skill categories
     public function fetchSkills()
     {
         $skills = Skill::all();
         return response()->json(['skills' => $skills], 200);
     }
 
-    // Assign a skill to a child
     public function assignSkill(Request $request)
     {
         $request->validate([
@@ -33,7 +31,6 @@ class SkillsController extends Controller
             return response()->json(['error' => 'Child not found or does not belong to the authenticated user'], 403);
         }
 
-        // Assign skill to the child
         $childSkill = ChildSkill::create([
             'child_id' => $request->children_id,
             'skill_id' => $request->skill_id,
@@ -46,7 +43,6 @@ class SkillsController extends Controller
         ], 201);
     }
 
-    // Fetch the assigned skill for a child
     public function fetchAssignedSkill($children_id)
     {
         $childSkill = ChildSkill::with('skill')
@@ -63,12 +59,11 @@ class SkillsController extends Controller
         return response()->json(['assigned_skill' => $childSkill->skill], 200);
     }
 
-    // Update the assigned skill for a child
     public function updateAssignedSkill(Request $request)
     {
         $request->validate([
-            'children_id' => 'required|exists:children_profiles,id', // Reference the 'id' column in the 'children_profiles' table
-            'skill_id' => 'required|exists:skills,id', // Reference the 'id' column in the 'skills' table
+            'children_id' => 'required|exists:children_profiles,id', 
+            'skill_id' => 'required|exists:skills,id',
         ]);
 
         $childSkill = ChildSkill::where('child_id', $request->children_id)
@@ -89,7 +84,6 @@ class SkillsController extends Controller
         ], 200);
     }
 
-    // Remove the assigned skill for a child
     public function removeAssignedSkill($children_id)
     {
         $childSkill = ChildSkill::where('child_id', $children_id)
