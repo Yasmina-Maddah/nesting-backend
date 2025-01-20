@@ -10,7 +10,7 @@ class ChildrenProfileSeeder extends Seeder
     public function run()
     {
         ChildrenProfile::create([
-            'parent_id' => 2, // Parent1 ID
+            'parent_id' => 2, 
             'name' => 'John Doe',
             'profile_photo' => 'john.jpg',
             'cover_photo' => 'john_cover.jpg',
@@ -20,7 +20,7 @@ class ChildrenProfileSeeder extends Seeder
         ]);
 
         ChildrenProfile::create([
-            'parent_id' => 3, // Parent2 ID
+            'parent_id' => 3, 
             'name' => 'Jane Smith',
             'profile_photo' => 'jane.jpg',
             'cover_photo' => 'jane_cover.jpg',
@@ -30,7 +30,7 @@ class ChildrenProfileSeeder extends Seeder
         ]);
 
         ChildrenProfile::create([
-            'parent_id' => 5, // Parent1 ID
+            'parent_id' => 5, 
             'name' => 'Jana Maddah',
             'profile_photo' => null,
             'cover_photo' => null,
