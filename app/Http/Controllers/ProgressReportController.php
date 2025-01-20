@@ -11,7 +11,6 @@ class ProgressReportController extends Controller
 {
     public function generateReport($childId)
     {
-        // Fetch child profile
         $child = ChildrenProfile::with('skills')->find($childId);
 
         if (!$child) {
@@ -20,16 +19,13 @@ class ProgressReportController extends Controller
 
         $reports = [];
         foreach ($child->skills as $skill) {
-            // Generate progress (this would be dynamic in a real-world case)
             $progress = random_int(50, 100);
 
-            // Identify areas for improvement
             $improvements = [];
             if ($progress < 75) {
                 $improvements[] = "Focus more on {$skill->skill_name}.";
             }
 
-            // Save or update report
             $report = ProgressReport::updateOrCreate(
                 ['child_skill_id' => $skill->pivot->id],
                 [
@@ -54,7 +50,6 @@ class ProgressReportController extends Controller
 
     public function getReport($childId)
     {
-        // Fetch child profile
         $child = ChildrenProfile::with('skills', 'skills.progressReports')->find($childId);
 
         if (!$child) {
