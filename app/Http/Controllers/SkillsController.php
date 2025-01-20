@@ -19,6 +19,8 @@ class SkillsController extends Controller
     // Assign skill to a child
     public function assignSkill(Request $request)
     {
+        \Log::info('AssignSkill Request:', $request->all()); // Log the request data
+
         $request->validate([
             'child_profile_id' => 'required|exists:children_profiles,id',
             'skill_id' => 'required|exists:skills,id',
