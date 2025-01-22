@@ -3,136 +3,174 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Skill;
-use App\Models\ChildrenProfile;
-use App\Models\ChildInteraction;
-use App\Models\ProgressReport;
 use OpenAI;
 
 class AIController extends Controller
 {
     /**
-     * Fetch AI Content (Story, Challenges) for the selected skill
+     * Generate a visualization and story for a skill.
      */
-    public function fetchAIContent(Request $request)
-{
-    $request->validate([
-        'child_profile_id' => 'required|exists:children_profiles,id',
-        'skill_id' => 'required|exists:skills,id',
-    ]);
-
-    $skill = Skill::find($request->skill_id);
-    $child = ChildrenProfile::find($request->child_profile_id);
-    $childAge = $child->age;
-
-    $client = OpenAI::client(config('services.openai.api_key'));
-
-    try {
-        $response = $client->chat()->create([
-            'model' => 'gpt-4',
-            'messages' => [
-                [
-                    'role' => 'system',
-                    'content' => 'You are an assistant generating child-friendly stories and challenges. Format challenges as valid JSON.',
-                ],
-                [
-                    'role' => 'user',
-                    'content' => "Generate a story and a JSON-formatted challenge for a child named {$child->name}, who is {$childAge} years old. The theme is based on the skill '{$skill->skill_name}'. Use the following format:\n\nStory: [Story text here]\n---\nChallenges: [{\"id\":1,\"description\":\"Challenge description\",\"skills_to_use\":[\"Skill 1\",\"Skill 2\"],\"completion_time\":\"Time required\"}]. Only return the JSON challenges array with valid syntax."
-                ],
-            ],
-            'max_tokens' => 500,
-        ]);
-         
-
-        $generatedContent = $response['choices'][0]['message']['content'] ?? '';
-
-        if (!$generatedContent || strpos($generatedContent, '---') === false) {
-            throw new \Exception('Invalid AI response format');
-        }
-
-        [$story, $challenges] = explode('---', $generatedContent);
-        
-        $challenges = trim($challenges);
-        $challenges = preg_replace('/[^\x20-\x7E]/', '', $challenges); 
-        $challenges = str_replace(['“', '”', '’'], ['"', '"', "'"], $challenges); 
-        $challenges = preg_replace('/,\s*}/', '}', $challenges); 
-        $challenges = json_decode($challenges, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            Log::error('Cleaned Challenges Content: ' . $challenges);
-            throw new \Exception('Invalid JSON in challenges');
-        }
-
-        return response()->json([
-            'story' => trim($story),
-            'challenges' => $challenges,
-        ]);
-        } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
-        }
-}
-
-
-    /**
-     * Submit Child's Response to a Challenge
-     */
-    public function submitResponse(Request $request)
+    public function generateVisualization(Request $request)
     {
-        $request->validate([
-            'child_profile_id' => 'required|exists:children_profiles,id',
-            'skill_id' => 'required|exists:skills,id',
-            'challenge_id' => 'required',
-            'response' => 'required|string',
+        $validated = $request->validate([
+            'skill_name' => 'required|string',
+            'child_name' => 'nullable|string',
         ]);
 
-        $challenge = ChildInteraction::where('skill_id', $request->skill_id)
-            ->value('challenge');
+        // Retrieve OpenAI API key from configuration
+        $apiKey = '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';
+        if (empty($apiKey)) {
+            throw new \Exception("OpenAI API key is not set or could not be retrieved.");
+        }
 
-        $isCorrect = $challenge[$request->challenge_id]['correct_option'] === $request->response;
+        \Log::info('OpenAI API Key:', ['key' => $apiKey]); // Log the API key for debugging
 
-        ChildInteraction::create([
-            'child_id' => $request->child_profile_id,
-            'skill_id' => $request->skill_id,
-            'challenge_id' => $request->challenge_id,
-            'response' => $request->response,
-            'is_correct' => $isCorrect,
-        ]);
+        $client = OpenAI::client($apiKey);
 
-        return response()->json([
-            'message' => 'Response submitted successfully',
-            'is_correct' => $isCorrect,
-        ]);
+        try {
+            // Generate story
+            $storyPrompt = "Create a fun and engaging story for a child focused on developing the skill: " . $validated['skill_name'];
+            if (!empty($validated['child_name'])) {
+                $storyPrompt .= " Personalize it for a child named " . $validated['child_name'] . ".";
+            }
+
+            $storyResponse = $client->chat()->create([
+                'model' => 'gpt-4', // Use a chat model
+                'messages' => [
+                    [
+                        'role' => 'system',
+                        'content' => 'You are a helpful assistant that creates engaging stories for children.',
+                    ],
+                    [
+                        'role' => 'user',
+                        'content' => "Create a fun and engaging story for a child focused on developing the skill: {$validated['skill_name']}." .
+                            (!empty($validated['child_name']) ? " Personalize it for a child named {$validated['child_name']}." : ""),
+                    ],
+                ],
+                'max_tokens' => 300,
+            ]);
+            
+            $storyText = trim($storyResponse['choices'][0]['message']['content']);
+            
+
+
+            // Generate visualization
+            $imagePrompt = "An artistic visualization of a child engaging with the skill: " . $validated['skill_name'];
+            $imageResponse = $client->images()->create([
+                'prompt' => $imagePrompt,
+                'n' => 1,
+                'size' => '1024x1024',
+            ]);
+
+            $imagePath = $imageResponse['data'][0]['url'];
+
+            return response()->json([
+                'story_text' => $storyText,
+                'visualization_path' => $imagePath,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error("Error in generating visualization: " . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
-     * Generate Progress Report for a Child and a Skill
+     * Generate a challenge for a skill.
      */
-    public function generateProgressReport(Request $request)
+    public function generateChallenge(Request $request)
     {
-        $request->validate([
-            'child_profile_id' => 'required|exists:children_profiles,id',
-            'skill_id' => 'required|exists:skills,id',
+        $validated = $request->validate([
+            'skill_name' => 'required|string',
         ]);
 
-        $interactions = ChildInteraction::where('child_id', $request->child_profile_id)
-            ->where('skill_id', $request->skill_id)
-            ->get();
+        // Retrieve OpenAI API key
+        $apiKey = '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';
+        if (empty($apiKey)) {
+            throw new \Exception("OpenAI API key is not set or could not be retrieved.");
+        }
 
-        $totalChallenges = $interactions->count();
-        $correctAnswers = $interactions->where('is_correct', true)->count();
-        $progressScore = $totalChallenges > 0 ? round(($correctAnswers / $totalChallenges) * 100) : 0;
+        $client = OpenAI::client($apiKey);
 
-        ProgressReport::create([
-            'child_id' => $request->child_profile_id,
-            'skill_id' => $request->skill_id,
-            'interaction_summary' => $interactions,
-            'progress_score' => $progressScore,
+        try {
+            $challengePrompt = "Create a simple challenge for a child to enhance their skill in " . $validated['skill_name'] . ".";
+            $challengeResponse = $client->chat()->create([
+                'model' => 'gpt-3.5-turbo', // Use a chat model
+                'messages' => [
+                    [
+                        'role' => 'system',
+                        'content' => 'You are a helpful assistant that creates challenges for children.',
+                    ],
+                    [
+                        'role' => 'user',
+                        'content' => "Create a simple challenge for a child to enhance their skill in {$validated['skill_name']}.",
+                    ],
+                ],
+                'max_tokens' => 150,
+            ]);
+            
+            $challengeText = trim($challengeResponse['choices'][0]['message']['content']);
+
+            return response()->json([
+                'challenge' => $challengeText,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error("Error in generating challenge: " . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Save interaction for AI visualization or challenge.
+     */
+    public function saveInteraction(Request $request)
+    {
+        $validated = $request->validate([
+            'child_id' => 'required|exists:children_profiles,id',
+            'visualization_id' => 'nullable|exists:ai_visualizations,id',
+            'response' => 'nullable|string',
+            'is_correct' => 'nullable|boolean',
         ]);
 
-        return response()->json([
-            'total_challenges' => $totalChallenges,
-            'correct_answers' => $correctAnswers,
-            'progress_score' => $progressScore,
+        try {
+            $interaction = ChildInteraction::create([
+                'child_id' => $validated['child_id'],
+                'visualization_id' => $validated['visualization_id'] ?? null,
+                'response' => $validated['response'],
+                'is_correct' => $validated['is_correct'] ?? false,
+            ]);
+
+            return response()->json([
+                'message' => 'Interaction saved successfully',
+                'interaction' => $interaction,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error("Error in saving interaction: " . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Fetch progress report for a child.
+     */
+    public function getProgress(Request $request, $child_id)
+    {
+        $validated = $request->validate([
+            'child_id' => 'exists:children_profiles,id',
         ]);
+
+        try {
+            $progressReports = ProgressReport::where('child_id', $child_id)->get();
+
+            if ($progressReports->isEmpty()) {
+                return response()->json(['message' => 'No progress reports found.'], 404);
+            }
+
+            return response()->json([
+                'progress' => $progressReports,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error("Error in fetching progress: " . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }

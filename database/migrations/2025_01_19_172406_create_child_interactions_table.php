@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('child_interactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('child_id')->constrained('children_profiles')->onDelete('cascade');
+            $table->foreignId('child_id')->constrained('child_profiles')->onDelete('cascade');
             $table->foreignId('visualization_id')->constrained('ai_visualizations')->onDelete('cascade');
             $table->text('response')->nullable();
             $table->boolean('is_correct')->default(false);

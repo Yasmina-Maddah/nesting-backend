@@ -7,8 +7,8 @@ use App\Http\Controllers\ChildrenProfileController;
 use App\Http\Controllers\SkillsController;
 use App\Http\Controllers\AIController;
 use App\Http\Controllers\ArticleController;
-
-
+use App\Http\Controllers\ScrapingController;
+use App\Http\Controllers\GameController;
 
 
 Route::post('/signup', [AuthController::class, 'signup']);
@@ -34,18 +34,25 @@ Route::middleware('auth:api')->group(function () {
 });
 
 
-Route::middleware('auth:api')->group(function () {
-    Route::get('/ai-content', [AIController::class, 'fetchAIContent']);
-    Route::post('/submit-response', [AIController::class, 'submitResponse']);
-    Route::get('/progress-report', [AIController::class, 'generateProgressReport']);
-});
+Route::post('/ai/visualizations', [AIController::class, 'generateVisualization']);
+Route::post('/ai/challenges', [AIController::class, 'generateChallenge']);
+Route::post('/ai/interactions', [AIController::class, 'saveInteraction']);
+Route::get('/ai/progress/{child_id}', [AIController::class, 'getProgress']);
 
-Route::get('/articles', [ArticleController::class, 'index'])->name('articles.index');
-Route::middleware(['auth', 'is_admin'])->group(function () {
-    Route::get('/articles/create', [ArticleController::class, 'create'])->name('articles.create');
-    Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store');
-    Route::get('/articles/{id}/edit', [ArticleController::class, 'edit'])->name('articles.edit');
-    Route::put('/articles/{id}', [ArticleController::class, 'update'])->name('articles.update');
-    Route::delete('/articles/{id}', [ArticleController::class, 'destroy'])->name('articles.destroy');
-});
+
+Route::get('/scrape-games', [ScrapingController::class, 'scrapeGames'])
+    ->middleware(['jwt.auth', 'admin']);
+
+
+
+Route::get('/games', [GameController::class, 'index']); // List all games
+Route::get('/games/search', [GameController::class, 'search']); // Search games by keyword
+Route::get('/games/{id}', [GameController::class, 'show']); // Get details of a specific game
+    
+
+
+    
+    
+    
+    
 
