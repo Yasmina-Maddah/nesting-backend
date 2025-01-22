@@ -15,7 +15,7 @@ return [
     |
     | Supported: "file", "cookie", "database", "apc",
     |            "memcached", "redis", "dynamodb", "array"
-    |
+    |s
     */
 
     'driver' => env('SESSION_DRIVER', 'database'),
